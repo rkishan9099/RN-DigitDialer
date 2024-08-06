@@ -6,21 +6,32 @@ import { Iconify } from 'react-native-iconify'
 import { router } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { useAppSelector } from '@/store/store'
+import { useCallDurationTimer } from '@/hooks/dialer/useCallDurationTimer'
+import { OngoingSessionState } from '@/types/sip.type'
 
 const OngoingAudioCall = () => {
 
-    const {SipUA}=useAppSelector((state)=>state.sip)
+    const [timeStart, setTimerStart] = useState(false)
+    const { TimerAction } = useCallDurationTimer()
+    const { SipUA, sessions, sessionState } = useAppSelector((state) => state.sip)
 
     const handlePress = () => {
         SipUA?.terminate(400, 'Call Terminated')
         router.replace("/")
     }
 
-// useEffect(()=>{
-//     if(sessionCount===0){
-//         router.replace("/index")
-//     }
-// },[sessionCount])
+    useEffect(() => {
+        if (sessions.size > 0 && sessionState === OngoingSessionState.ANSWERED && !timeStart) {
+            setTimerStart(true)
+            TimerAction("start")
+        } else {
+            TimerAction("stop")
+            setTimerStart(false)
+        }
+    }, [sessions, timeStart, sessionState])
+
+
+
     return (
         <SafeAreaView className='flex-1 w-full flex-col justify-around items-center py-[50px] bg-white '>
             <View>

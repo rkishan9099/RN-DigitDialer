@@ -11,6 +11,7 @@ import { store } from '@/store/store';
 import { Provider } from 'react-redux';
 import SipUAClient, {SipUA} from '@/services/sip/SippUA';
 import { updateSipState } from '@/store/sip';
+import { CallTimerDurationProvider } from '@/context/CallTimerContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -44,6 +45,7 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
+      <CallTimerDurationProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
           screenOptions={{ headerShown: false }} // Hide headers globally
@@ -54,6 +56,7 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>
+      </CallTimerDurationProvider>
     </Provider>
   );
 }

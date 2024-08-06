@@ -1,3 +1,4 @@
+import { useCallDurationTimer } from '@/hooks/dialer/useCallDurationTimer'
 import React from 'react'
 import { Image, Text, View } from 'react-native'
 
@@ -7,6 +8,7 @@ type PropsType = {
 }
 
 const CallProfileAvatar = (props: PropsType) => {
+    const {callTimer}=useCallDurationTimer()
     const { number, name } = props
     return (
         <View className='flex flex-col items-center'>
@@ -18,6 +20,7 @@ const CallProfileAvatar = (props: PropsType) => {
             </View>
             {name && <Text className='text-center text-blue-500 mt-1 text-2xl font-bold '>{name}</Text>}
             <Text className='text-center text-gray-500 text-md font-bold mt-2'>{number}</Text>
+            <Text className='text-center text-gray-500 text-md font-semibold mt-3'>{callTimer}</Text>
         </View>
     )
 }
