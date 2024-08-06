@@ -2,14 +2,15 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { store } from '@/store/store';
 import { Provider } from 'react-redux';
-import SipUA from '@/services/sip/SippUA';
+import SipUAClient, {SipUA} from '@/services/sip/SippUA';
+import { updateSipState } from '@/store/sip';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -21,7 +22,7 @@ export default function RootLayout() {
   });
 
   // Use useRef to maintain a single instance of SipUA
-  const sipUARef = useRef<SipUA | null>(null);
+  const sipUARef = useRef<SipUAClient | null>(null);
 
   useEffect(() => {
     if (loaded) {
@@ -31,8 +32,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!sipUARef.current) {
-      sipUARef.current = new SipUA();
+      sipUARef.current =SipUA;
       sipUARef.current.createUA();
+      store.dispatch(updateSipState({key:"SipUA", value:sipUARef.current}));
     }
   }, []);
 

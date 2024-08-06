@@ -1,35 +1,29 @@
 import { Input } from '@/components/ui/input'
 import RHFTextField from '@/hooks/hook-form/RHFTextField';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { Button } from 'react-native';
+import { Button, TouchableOpacity } from 'react-native';
 import { Alert, Text, TextInput, View } from 'react-native'
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import StorageService from '@/services/storage/storage';
 import { router } from 'expo-router';
 import { StorageKey } from '@/constants/storage.constant';
+import { SipConfigSchema, SipConfigType } from '@/types/sip.type';
+import { SipUA } from '@/services/sip/SippUA';
 
 
 
-// Define the validation schema
-const schema = z.object({
-    username: z.string().min(1, 'UserName is required'),
-    password: z.string().min(1, 'Password is required'),
-    sipServer: z.string().min(1, 'Sip Server is required'),
-    sipPort: z.string().min(1, 'Sip Port is required'),
-    wssUrl: z.string().min(1, 'Wss Url is required'),
-});
 
-type FormValues = z.infer<typeof schema>;
+
+type FormValues = z.infer<typeof SipConfigSchema>;
 
 
 const SettingsScreen = () => {
-
     const methods = useForm<FormValues>({
-        resolver: zodResolver(schema),
+        resolver: zodResolver(SipConfigSchema),
         defaultValues: {
-            username: "",
+            username: "7002",
             password: "digit90digit@@digit90",
             sipServer: "14switch.digitechnobytes.online",
             sipPort: "7443",
@@ -37,9 +31,20 @@ const SettingsScreen = () => {
         }
     });
 
+    const setDefaultValues = async () => {
+        const values = await StorageService.getData(StorageKey.SIP_CONFIGURATION) as SipConfigType;
+        if(values){
+            methods.reset(values);
+        }
+    }
+    useEffect(()=>{
+        setDefaultValues()
+    },[])
+
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         await StorageService.saveData(StorageKey.SIP_CONFIGURATION, data);
         Alert.alert("Success", "Sip Configuration saved successfully");
+       SipUA.createUA();
         router.push("/")
 
     };
@@ -82,14 +87,16 @@ const SettingsScreen = () => {
                     <View className='w-full'>
                         <Text className="mb-1">Wss Url:</Text>
                         <RHFTextField
-                            name="sipPort"
-                            placeholder="Sip Port"
+                            name="wssUrl"
+                            placeholder="WssUrl"
                         />
                     </View>
                 </View>
 
 
-                <Button title="Submit" onPress={methods.handleSubmit(onSubmit)} />
+                <TouchableOpacity  onPress={methods.handleSubmit(onSubmit)} style={{ marginTop: 20 }}>
+                    <Text className='bg-blue-500 text-white text-center px-4 py-2 rounded-lg'>Save</Text>
+                </TouchableOpacity>
             </FormProvider>
         </View>
     )

@@ -3,6 +3,7 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Iconify } from 'react-native-iconify';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -18,7 +19,8 @@ export default function TabLayout() {
         options={{
           title: 'Dialpad',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={"documents"} color={color} />
+            <Iconify icon="material-symbols:dialpad" size={28} color={color} />
+
           ),
         }}
       />
@@ -27,7 +29,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={"settings"} color={color} />
+            <Iconify icon="flat-color-icons:settings" size={28} color={color} />
           ),
         }}
       />

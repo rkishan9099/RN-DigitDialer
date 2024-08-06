@@ -4,6 +4,7 @@ import DialPad from "./DialPad";
 import { TouchableOpacity } from "react-native";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Ionicons } from "@expo/vector-icons";
+import { Iconify } from "react-native-iconify";
 
 
 const CallDialpad = () => {

@@ -15,7 +15,7 @@ const InboundConnecting = () => {
 
     const rejectHandler = () => {
         sipUA.terminate(486, 'Call Rejected')
-        router.replace("/index-dial")
+        router.replace("/")
     }
     return (
         <SafeAreaView className='flex-1 flex-col justify-between py-[50px] bg-blue-100 '>

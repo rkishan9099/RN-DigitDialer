@@ -10,7 +10,7 @@ class StorageService {
   }
 
   // Load data from AsyncStorage with a custom key
-  static async loadData<T>(key: string): Promise<T | null> {
+  static async getData(key: string): Promise<any> {
     try {
       const jsonValue = await AsyncStorage.getItem(key);
       return jsonValue != null ? JSON.parse(jsonValue) : null;

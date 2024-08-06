@@ -1,32 +1,35 @@
 import IconButton from '@/components/ui/IconButton'
-import SipUA from '@/services/sip/SippUA'
+import {SipUA} from '@/services/sip/SippUA'
+import { useAppSelector } from '@/store/store'
 import { StyleSheet } from 'nativewind'
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import { Iconify } from 'react-native-iconify'
 
 const CallActionButton = () => {
-
-    const sipUA = new SipUA();
+    const [isMuted, setIsMuted] = useState(false)
+    const [isHolded, setIsHolded] = useState(false)
     function handlePress(): void {
         throw new Error('Function not implemented.')
     }
 
 
     const handleToogleMute = () => {
-        if(sipUA?.isMuted()){
-            sipUA.unmute();
+        if(isMuted){
+            SipUA.unmute();
         }else{
-            sipUA.mute();
+            SipUA?.mute();
         }
+        setIsMuted(!isMuted)
     }
 
     const handleToogleHold = () => {
-        if(sipUA?.isHolded()){
-            sipUA.unhold();
+        if(isHolded){
+            SipUA.unhold();
         }else{
-            sipUA.hold();
+            SipUA?.hold();
         }
+        setIsHolded(!isHolded)
     }
 
     return (
@@ -40,7 +43,7 @@ const CallActionButton = () => {
                     style={[styles.button]}
                 >
                     {
-                        sipUA.isMuted() ? <Iconify icon="rivet-icons:microphone-off-solid" size={24} color="#3b82f6" /> : <Iconify icon="fa-solid:microphone" size={24} color="#3b82f6" />
+                       isMuted ? <Iconify icon="rivet-icons:microphone-off-solid" size={24} color="#3b82f6" /> : <Iconify icon="fa-solid:microphone" size={24} color="#3b82f6" />
                     }
 
                     {/* <Iconify icon="rivet-icons:microphone-off-solid" size={24} color="#3b82f6" /> */}
@@ -53,7 +56,7 @@ const CallActionButton = () => {
                     style={[styles.button]}
                 >
                     {
-                        sipUA?.isHolded() ? <Iconify icon="solar:pause-bold" size={24} color="#3b82f6" /> : <Iconify icon="solar:play-bold" size={24} color="#3b82f6" />
+                       isHolded? <Iconify icon="solar:pause-bold" size={24} color="#3b82f6" /> : <Iconify icon="solar:play-bold" size={24} color="#3b82f6" />
                     }
 
                 </IconButton>

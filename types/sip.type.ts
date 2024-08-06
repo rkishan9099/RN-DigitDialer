@@ -1,8 +1,11 @@
+import SipUAClient, {SipUA} from "@/services/sip/SippUA";
 import SipSession from "@/services/sip/SipSession";
 import { UA } from "jssip";
 import { RTCSession } from "jssip/lib/RTCSession";
+import { z } from "zod";
 
 export interface SipSliceType {
+  SipUA:SipUAClient | null
   userAgent: any;
   connectingStatus: ConnectingStatus;
   connected: boolean;
@@ -134,3 +137,15 @@ export interface HoldState {
   status: string;
   originator: string;
 }
+
+
+// Define the validation schema
+export const SipConfigSchema = z.object({
+  username: z.string().min(1, 'UserName is required'),
+  password: z.string().min(1, 'Password is required'),
+  sipServer: z.string().min(1, 'Sip Server is required'),
+  sipPort: z.string().min(1, 'Sip Port is required'),
+  wssUrl: z.string().min(1, 'Wss Url is required'),
+});
+
+export type SipConfigType = z.infer<typeof SipConfigSchema>;

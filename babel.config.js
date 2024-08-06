@@ -6,7 +6,7 @@ module.exports = function (api) {
       "nativewind/babel",
     ],
     plugins: [
-      'react-native-iconify/plugin',
+       'react-native-iconify/plugin'
     ],
   };
 };

@@ -13,6 +13,7 @@ import {
   OngoingSessionState,
   SipSessionStatus,
   SipSessionState,
+  SipConfigType,
 } from "@/types/sip.type";
 import * as events from "events";
 import { debug, UA, WebSocketInterface } from "jssip";
@@ -42,6 +43,9 @@ import SipSession from "./SipSession";
 import { formatPhoneNumber, normalizeNumber } from "./sip-utils";
 import { UA_START, UA_STOP } from "./sip-constants";
 import { router } from "expo-router";
+import { StorageKey } from "@/constants/storage.constant";
+import StorageService from "../storage/storage";
+import { Alert } from "react-native";
 
 const sipServerAddress = "wss://s14switch.digitechnobytes.online:7443";
 
@@ -53,7 +57,7 @@ const settings = {
   register: true,
 };
 
-export default class SipUA extends events.EventEmitter {
+ class SipUAClient extends events.EventEmitter {
   sipUA: UA | undefined;
   #sessionManager: SipSessionManager;
   #rtcConfig: RTCConfiguration;
@@ -64,19 +68,28 @@ export default class SipUA extends events.EventEmitter {
     this.#rtcConfig = settings.pcConfig;
   }
 
-  createUA = () => {
+  createUA = async () => {
     const client = {
-      username: `7002@s14switch.digitechnobytes.online`,
-      password: "digit90digit@@digit90",
-      name: "7002",
+      username: `7005@s14switch.digitechnobytes.online`,
+      password: "dial9099digit",
+      name: "7003",
     };
+
+    console.debug("Creating SIP User Agent...");
+
+    const sipConfiguration = await StorageService.getData(StorageKey.SIP_CONFIGURATION) as SipConfigType;
+    if(!sipConfiguration){
+      Alert.alert("Error", "Sip Configuration not found");
+      return;
+    }
+    console.debug("sipConfiguration",sipConfiguration);
 
     debug.enable("JsSIP:*");
     this.sipUA = new UA({
-      uri: `sip:${client.username}`,
-      password: client.password,
-      display_name: client.name,
-      sockets: [new WebSocketInterface(sipServerAddress)],
+      uri: `sip:${sipConfiguration.username}@${sipConfiguration.sipServer}`,
+      password: sipConfiguration.password,
+      display_name: sipConfiguration.username,
+      sockets: [new WebSocketInterface(sipConfiguration.wssUrl)],
       register: settings.register,
     });
     this.sipUA.on("connecting", (data) => {
@@ -161,15 +174,18 @@ export default class SipUA extends events.EventEmitter {
       session.on("failed", (args: any) => {
         this.updateSession(SipSessionStatus.SESSION_FAILED, sipSession, args);
         if(this.#sessionManager.count === 0){
-          router.replace("/index-dial")
+          router.replace("/")
         }
       });
 
       session.on("ended", (args: any) => {
         this.updateSession(SipSessionStatus.SESSION_ENDED, sipSession, args);
-        if(this.#sessionManager.count === 0){
-          router.replace("/index-dial")
+        const sessions = store.getState().sip.sessions;
+        if(sessions.size===0){
+          router.replace("/")
+          
         }
+      
       });
       sipSession.on(SipSessionStatus.SESSION_ANSWERED, (args) => {
         this.updateSession(SipSessionStatus.SESSION_ANSWERED, sipSession, args);
@@ -206,6 +222,7 @@ export default class SipUA extends events.EventEmitter {
     // this.sipUA.on("newRTCSession",())
     this.sipUA.start();
     store.dispatch(setUserAgent(this.sipUA));
+    store.dispatch(updateSipState({key:"SipUA",value:this}))
   };
 
   async makeCall(
@@ -426,8 +443,9 @@ export default class SipUA extends events.EventEmitter {
       return this.#sessionManager.getSessionState(id);
     }
   }
-  getDialNumber() {
+  getDialNumber() :string{
     const allSessions = this.getAllSessions();
+    let  number="";
     const dialNumber: string[] = [];
     if (allSessions && allSessions.length > 0) {
       allSessions.forEach((session: SipSessionState) => {
@@ -436,8 +454,10 @@ export default class SipUA extends events.EventEmitter {
         }
       });
 
-      return dialNumber.join();
+      number = dialNumber.join();
     }
+
+    return number;
   }
 
   /// Mute All Conference Call
@@ -525,3 +545,6 @@ export default class SipUA extends events.EventEmitter {
     }
   }
 }
+
+export default SipUAClient;
+export const SipUA = new SipUAClient();

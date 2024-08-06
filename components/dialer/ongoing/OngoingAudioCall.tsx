@@ -1,22 +1,30 @@
-import React from 'react'
 import { SafeAreaView, Text, View } from 'react-native'
 import CallProfileAvatar from '../CallProfileAvatar'
 import CallActionButton from './CallActionButton'
 import IconButton from '@/components/ui/IconButton'
 import { Iconify } from 'react-native-iconify'
-import SipUA from '@/services/sip/SippUA'
 import { router } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { useAppSelector } from '@/store/store'
 
 const OngoingAudioCall = () => {
-    const sipUa = new SipUA();
+
+    const {SipUA}=useAppSelector((state)=>state.sip)
+
     const handlePress = () => {
-        sipUa.terminate(400, 'Call Terminated')
-        router.replace("/index-dial")
+        SipUA?.terminate(400, 'Call Terminated')
+        router.replace("/")
     }
+
+// useEffect(()=>{
+//     if(sessionCount===0){
+//         router.replace("/index")
+//     }
+// },[sessionCount])
     return (
         <SafeAreaView className='flex-1 w-full flex-col justify-around items-center py-[50px] bg-white '>
             <View>
-                <CallProfileAvatar number={sipUa.getDialNumber() as string} name='Kishan Ramani' />
+                <CallProfileAvatar number={SipUA?.getDialNumber() as string} name='Kishan Ramani' />
             </View>
             <View className='w-full mt-9 flex justify-center items-center'>
                 <CallActionButton />

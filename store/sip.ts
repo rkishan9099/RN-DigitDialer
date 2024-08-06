@@ -11,6 +11,7 @@ import { enableMapSet } from "immer";
 import { RTCSession } from "jssip/lib/RTCSession";
 
 const initialState: SipSliceType = {
+  SipUA: null,
   userAgent: null,
   connectingStatus: ConnectingStatus.Disconnected,
   connected: false,
